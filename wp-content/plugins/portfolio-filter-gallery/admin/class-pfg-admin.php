@@ -506,6 +506,7 @@ class PFG_Admin {
                     $images[] = array(
                         'id'           => absint( $image['id'] ),
                         'title'        => isset( $image['title'] ) ? sanitize_text_field( $image['title'] ) : '',
+                        'alt'          => isset( $image['alt'] ) ? sanitize_text_field( $image['alt'] ) : '',
                         'description'  => isset( $image['description'] ) ? sanitize_textarea_field( $image['description'] ) : '',
                         'link'         => isset( $image['link'] ) ? esc_url_raw( $image['link'] ) : '',
                         'type'         => isset( $image['type'] ) ? sanitize_key( $image['type'] ) : 'image',
@@ -555,6 +556,7 @@ class PFG_Admin {
                 $images[] = array(
                     'id'           => absint( $image['id'] ),
                     'title'        => isset( $image['title'] ) ? sanitize_text_field( $image['title'] ) : '',
+                    'alt'          => isset( $image['alt'] ) ? sanitize_text_field( $image['alt'] ) : '',
                     'description'  => isset( $image['description'] ) ? sanitize_textarea_field( $image['description'] ) : '',
                     'link'         => isset( $image['link'] ) ? esc_url_raw( $image['link'] ) : '',
                     'type'         => isset( $image['type'] ) ? sanitize_key( $image['type'] ) : 'image',

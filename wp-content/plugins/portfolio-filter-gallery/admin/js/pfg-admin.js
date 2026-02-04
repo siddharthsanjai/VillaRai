@@ -646,6 +646,11 @@
             if (typeof index === 'undefined') {
                 index = $('.pfg-image-item').length;
             }
+            
+            // Handle alt text and description from image data
+            var altText = image.alt || '';
+            var description = image.description || '';
+            
             return `
                 <div class="pfg-image-item" data-id="${image.id}" data-index="${index}">
                     <label class="pfg-image-checkbox" style="position: absolute; top: 8px; left: 8px; z-index: 10;">
@@ -665,7 +670,8 @@
                     </div>
                     <input type="hidden" name="pfg_images[${index}][id]" value="${image.id}">
                     <input type="hidden" name="pfg_images[${index}][title]" value="${image.title}">
-                    <input type="hidden" name="pfg_images[${index}][description]" value="">
+                    <input type="hidden" name="pfg_images[${index}][alt]" value="${altText}">
+                    <input type="hidden" name="pfg_images[${index}][description]" value="${description}">
                     <input type="hidden" name="pfg_images[${index}][link]" value="">
                     <input type="hidden" name="pfg_images[${index}][type]" value="image">
                     <input type="hidden" name="pfg_images[${index}][filters]" value="">

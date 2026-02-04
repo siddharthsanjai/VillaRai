@@ -26,12 +26,12 @@ function mytheme_assets()
         '1.0'
     );
 
-    wp_enqueue_style(
-        'google-fonts',
-        'https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap',
-        array(),
-        null
-    );
+    // wp_enqueue_style(
+    //     'google-fonts',
+    //     'https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap',
+    //     array(),
+    //     null
+    // );
 
     wp_enqueue_style(
         'font-awesome',
@@ -48,12 +48,12 @@ function mytheme_assets()
     );
 
 
-    wp_enqueue_style(
-        'animate-css',
-        get_template_directory_uri() . '/assets/lib/animate/animate.min.css',
-        array(),
-        '1.0'
-    );
+    // wp_enqueue_style(
+    //     'animate-css',
+    //     get_template_directory_uri() . '/assets/lib/animate/animate.min.css',
+    //     array(),
+    //     '1.0'
+    // );
 
     // wp_enqueue_style(
     //     'owl-carousel',
@@ -81,35 +81,35 @@ function mytheme_assets()
         array('jquery'),
         '5.0',
         true
-        
+
     );
 
 
-    wp_enqueue_script(
-        'wow',
-        get_template_directory_uri() . '/assets/lib/wow/wow.min.js',
-        array('jquery'),
-        '1.1.2',
-        true
-    );
+    // wp_enqueue_script(
+    //     'wow',
+    //     get_template_directory_uri() . '/assets/lib/wow/wow.min.js',
+    //     array('jquery'),
+    //     '1.1.2',
+    //     true
+    // );
 
 
-    wp_enqueue_script(
-        'easing',
-        get_template_directory_uri() . '/assets/lib/easing/easing.min.js',
-        array('jquery'),
-        '1.4.1',
-        true
-    );
+    // wp_enqueue_script(
+    //     'easing',
+    //     get_template_directory_uri() . '/assets/lib/easing/easing.min.js',
+    //     array('jquery'),
+    //     '1.4.1',
+    //     true
+    // );
 
 
-    wp_enqueue_script(
-        'waypoints',
-        get_template_directory_uri() . '/assets/lib/waypoints/waypoints.min.js',
-        array('jquery'),
-        '4.0.1',
-        true
-    );
+    // wp_enqueue_script(
+    //     'waypoints',
+    //     get_template_directory_uri() . '/assets/lib/waypoints/waypoints.min.js',
+    //     array('jquery'),
+    //     '4.0.1',
+    //     true
+    // );
 
 
     // wp_enqueue_script(
@@ -121,39 +121,39 @@ function mytheme_assets()
     // );
 
 
-    wp_enqueue_script(
-        'owl-carousel',
-        get_template_directory_uri() . '/assets/lib/owlcarousel/owl.carousel.min.js',
-        array('jquery'),
-        '2.3.4',
-        true
-    );
+    // wp_enqueue_script(
+    //     'owl-carousel',
+    //     get_template_directory_uri() . '/assets/lib/owlcarousel/owl.carousel.min.js',
+    //     array('jquery'),
+    //     '2.3.4',
+    //     true
+    // );
 
 
-    wp_enqueue_script(
-        'moment',
-        get_template_directory_uri() . '/assets/lib/tempusdominus/js/moment.min.js',
-        array('jquery'),
-        '2.29.1',
-        true
-    );
+    // wp_enqueue_script(
+    //     'moment',
+    //     get_template_directory_uri() . '/assets/lib/tempusdominus/js/moment.min.js',
+    //     array('jquery'),
+    //     '2.29.1',
+    //     true
+    // );
 
-    wp_enqueue_script(
-        'moment-timezone',
-        get_template_directory_uri() . '/assets/lib/tempusdominus/js/moment-timezone.min.js',
-        array('moment'),
-        '0.5.33',
-        true
-    );
+    // wp_enqueue_script(
+    //     'moment-timezone',
+    //     get_template_directory_uri() . '/assets/lib/tempusdominus/js/moment-timezone.min.js',
+    //     array('moment'),
+    //     '0.5.33',
+    //     true
+    // );
 
 
-    wp_enqueue_script(
-        'tempusdominus',
-        get_template_directory_uri() . '/assets/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js',
-        array('jquery', 'moment'),
-        '5.39.0',
-        true
-    );
+    // wp_enqueue_script(
+    //     'tempusdominus',
+    //     get_template_directory_uri() . '/assets/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js',
+    //     array('jquery', 'moment'),
+    //     '5.39.0',
+    //     true
+    // );
 
 
     wp_enqueue_script(

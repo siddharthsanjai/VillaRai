@@ -126,6 +126,7 @@ class PFG_Renderer {
             'data-filter-logic'    => $filter_logic,
             'data-filter-hierarchy'=> wp_json_encode( $filter_hierarchy ),
             'data-url-param'       => $url_param_name, // Always pass for JS compatibility
+            'data-version'         => PFG_VERSION,
         );
 
         // Add preloader class if enabled

@@ -461,14 +461,22 @@ class PFG_Gallery {
 
         $image_ids   = $legacy['image-ids'];
         $titles      = isset( $legacy['image_title'] ) ? $legacy['image_title'] : array();
-        $descs       = isset( $legacy['image_desc'] ) ? $legacy['image_desc'] : array();
+        
+        // Note: Legacy uses 'image-desc' (hyphen, indexed array)
+        $descs       = isset( $legacy['image-desc'] ) ? $legacy['image-desc'] : array();
+        
+        // Note: Legacy uses 'slide-alt' (keyed by image ID)
+        $alts        = isset( $legacy['slide-alt'] ) ? $legacy['slide-alt'] : array();
+        
+        // Note: Legacy uses 'image-link' (keyed by image ID)
         $links       = isset( $legacy['image-link'] ) ? $legacy['image-link'] : array();
+        
+        // Note: Legacy uses 'slide-type' (keyed by image ID)
         $types       = isset( $legacy['slide-type'] ) ? $legacy['slide-type'] : array();
+        
         $filters     = isset( $legacy['filters'] ) ? $legacy['filters'] : array();
 
         // Build a lookup map: filter ID => filter slug
-        // Legacy filters are stored in option 'awl_portfolio_filter_gallery_categories' as ID => Name
-        // New filters are stored in 'pfg_filters' as array with 'id', 'slug', 'name' keys
         $filter_id_to_slug = $this->build_legacy_filter_map();
 
         foreach ( $image_ids as $index => $id ) {
@@ -493,12 +501,54 @@ class PFG_Gallery {
                 }
             }
 
+            // Get alt text: Legacy 'slide-alt' is keyed by image ID, not index
+            $alt_text = '';
+            if ( isset( $alts[ $id ] ) && ! empty( $alts[ $id ] ) ) {
+                $alt_text = $alts[ $id ];
+            } elseif ( isset( $alts[ $index ] ) && ! empty( $alts[ $index ] ) ) {
+                $alt_text = $alts[ $index ];
+            } else {
+                // Fall back to WordPress attachment alt text
+                $alt_text = get_post_meta( $id, '_wp_attachment_image_alt', true );
+            }
+            
+            // Get description: Legacy 'image-desc' is indexed array
+            $description = '';
+            if ( isset( $descs[ $index ] ) && ! empty( $descs[ $index ] ) ) {
+                $description = $descs[ $index ];
+            }
+            
+            // Get link: Legacy 'image-link' is keyed by image ID
+            $link = '';
+            if ( isset( $links[ $id ] ) && ! empty( $links[ $id ] ) ) {
+                $link = $links[ $id ];
+            } elseif ( isset( $links[ $index ] ) && ! empty( $links[ $index ] ) ) {
+                $link = $links[ $index ];
+            }
+            
+            // Get type: Legacy 'slide-type' is keyed by image ID
+            // In legacy: 'image' = lightbox, 'video' = video lightbox
+            // In new format: 'image' = lightbox, 'video' = video lightbox, 'url' = external link
+            // If legacy type is 'image' but has a link URL, it means external link (type='url')
+            $type = 'image';
+            if ( isset( $types[ $id ] ) && ! empty( $types[ $id ] ) ) {
+                $type = $types[ $id ];
+            } elseif ( isset( $types[ $index ] ) && ! empty( $types[ $index ] ) ) {
+                $type = $types[ $index ];
+            }
+            
+            // Convert legacy 'image' type with link to new 'url' type (external link)
+            if ( $type === 'image' && ! empty( $link ) ) {
+                $type = 'url';
+            }
+
             $images[] = array(
                 'id'          => $id,
                 'title'       => isset( $titles[ $index ] ) ? $titles[ $index ] : get_the_title( $id ),
-                'description' => isset( $descs[ $index ] ) ? $descs[ $index ] : '',
-                'link'        => isset( $links[ $index ] ) ? $links[ $index ] : '',
-                'type'        => isset( $types[ $index ] ) ? $types[ $index ] : 'image',
+                'alt'         => $alt_text,
+                'description' => $description,
+                'link'        => $link,
+                'type'        => $type,
                 'filters'     => $filter_slugs,
             );
         }

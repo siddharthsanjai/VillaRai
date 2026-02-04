@@ -32,7 +32,7 @@
             <div class="row gx-0">
                 <div class="col-lg-2 bg-white d-none d-lg-block">
                     <a href="<?php echo home_url(); ?>"
-                        class="navbar-brand w-80 h-80 m-0 p-0 d-flex align-items-center justify-content-center ">
+                        class="navbar-brand w-80 h-80 m-0 p-0 d-flex justify-content-center ">
                         <h1 class="custom-logo"><img
                                 src="<?php echo get_template_directory_uri(); ?>/assets/img/Logo_Vila-Rai_B.png"
                                 alt="VillaRai Logo">
@@ -67,7 +67,7 @@
                     <nav class="navbar navbar-expand-lg bg-white navbar-light p-0 p-lg-0">
                         <a href="<?php echo home_url(); ?>" class="navbar-brand d-block d-lg-none">
                             <h2 class="custom-logo"><img
-                                    src="<?php echo get_template_directory_uri(); ?>/assets/img/villa-logo.png"
+                                    src="<?php echo get_template_directory_uri(); ?>/assets/img/Logo_Vila-Rai_B.png"
                                     alt="VillaRai Logo"></h2>
                             <!-- <h1 class="m-0 text-primary text-uppercase">VillaRai</h1> -->
 

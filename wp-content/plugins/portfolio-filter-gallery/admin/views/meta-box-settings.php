@@ -155,11 +155,31 @@ if ( class_exists( 'PFG_Templates' ) ) {
             <div class="pfg-form-row pfg-layout-option" data-layouts="grid,masonry">
                 <label class="pfg-form-label">
                     <?php esc_html_e( 'Columns', 'portfolio-filter-gallery' ); ?>
-                    <small><?php esc_html_e( 'Number of columns on desktop screens', 'portfolio-filter-gallery' ); ?></small>
+                    <small><?php esc_html_e( 'Number of columns per device type', 'portfolio-filter-gallery' ); ?></small>
                 </label>
-                <div class="pfg-range">
-                    <input type="range" name="pfg_settings[columns]" min="1" max="10" value="<?php echo esc_attr( $settings['columns_lg'] ?? 3 ); ?>" data-suffix="">
-                    <span class="pfg-range-value"><?php echo esc_html( $settings['columns_lg'] ?? 3 ); ?></span>
+                <div class="pfg-responsive-columns">
+                    <!-- Device Type Toggle -->
+                    <div class="pfg-device-toggle">
+                        <button type="button" class="pfg-device-btn active" data-device="desktop" title="<?php esc_attr_e( 'Desktop', 'portfolio-filter-gallery' ); ?>">
+                            <span class="dashicons dashicons-desktop"></span>
+                        </button>
+                        <button type="button" class="pfg-device-btn pfg-device-pro" data-device="tablet" title="<?php esc_attr_e( 'Tablet (Pro)', 'portfolio-filter-gallery' ); ?>">
+                            <span class="dashicons dashicons-tablet"></span>
+                            <span class="pfg-device-pro-badge">PRO</span>
+                        </button>
+                        <button type="button" class="pfg-device-btn pfg-device-pro" data-device="mobile" title="<?php esc_attr_e( 'Mobile (Pro)', 'portfolio-filter-gallery' ); ?>">
+                            <span class="dashicons dashicons-smartphone"></span>
+                            <span class="pfg-device-pro-badge">PRO</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Desktop Columns (only one active in free version) -->
+                    <div class="pfg-device-panel pfg-device-desktop active">
+                        <div class="pfg-range">
+                            <input type="range" name="pfg_settings[columns]" min="1" max="10" value="<?php echo esc_attr( $settings['columns_lg'] ?? 3 ); ?>" data-suffix="">
+                            <span class="pfg-range-value"><?php echo esc_html( $settings['columns_lg'] ?? 3 ); ?></span>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -1352,6 +1372,91 @@ if ( class_exists( 'PFG_Templates' ) ) {
     color: #78350f;
     text-decoration: underline;
 }
+.pfg-upsell-icon {
+    display: inline-flex;
+    gap: 2px;
+    margin-right: 8px;
+    color: #92400e;
+}
+.pfg-upsell-icon .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+/* Device Type Responsive Columns */
+.pfg-responsive-columns {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.pfg-device-toggle {
+    display: inline-flex;
+    background: #f1f5f9;
+    border-radius: 8px;
+    padding: 4px;
+    gap: 2px;
+}
+.pfg-device-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 32px;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #64748b;
+    position: relative;
+}
+.pfg-device-btn:hover {
+    background: #e2e8f0;
+    color: #475569;
+}
+.pfg-device-btn.active {
+    background: #fff;
+    border-color: #3858e9;
+    color: #3858e9;
+    box-shadow: 0 1px 3px rgba(56, 88, 233, 0.2);
+}
+.pfg-device-btn .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+.pfg-device-panel {
+    display: none;
+    flex: 1;
+}
+.pfg-device-panel.active {
+    display: block;
+}
+.pfg-device-panel .pfg-range {
+    min-width: 200px;
+}
+
+/* PRO Badge styles */
+.pfg-device-pro-badge {
+    position: absolute;
+    top: -4px;
+    right: -6px;
+    background: #b45309;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 700;
+    padding: 1px 3px;
+    border-radius: 4px;
+    line-height: 1;
+}
+.pfg-device-btn.pfg-device-pro {
+    opacity: 0.8;
+}
+.pfg-device-btn.pfg-device-pro:hover {
+    cursor: not-allowed;
+    background: #fef3c7;
+    color: #b45309;
+}
 </style>
 
 <script>
@@ -1449,6 +1554,19 @@ jQuery(document).ready(function($) {
     $('.pfg-range input[type="range"]').on('input', function() {
         var suffix = $(this).data('suffix') || '';
         $(this).siblings('.pfg-range-value').text(this.value + suffix);
+    });
+    
+    // Premium device toggle (Free version behavior)
+    $('.pfg-device-btn').on('click', function(e) {
+        if ($(this).hasClass('pfg-device-pro')) {
+            e.preventDefault();
+            return;
+        }
+        
+        // Desktop click (normal behavior)
+        var $wrapper = $(this).closest('.pfg-responsive-columns');
+        $wrapper.find('.pfg-device-btn').removeClass('active');
+        $(this).addClass('active');
     });
     
     // Tab switching

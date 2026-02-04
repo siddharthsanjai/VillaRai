@@ -406,6 +406,45 @@ $filter_tree = pfg_build_filter_tree_for_images( $filters );
                         <input type="checkbox" class="pfg-image-select" style="width: 18px; height: 18px; cursor: pointer;">
                     </label>
                     
+                    <?php 
+                    // Type indicator icons
+                    $image_type = isset( $image['type'] ) ? $image['type'] : 'image';
+                    $image_link = isset( $image['link'] ) ? $image['link'] : '';
+                    
+                    // Detect video source for different styling
+                    $video_source = '';
+                    if ( $image_type === 'video' && $image_link ) {
+                        if ( strpos( $image_link, 'youtube.com' ) !== false || strpos( $image_link, 'youtu.be' ) !== false ) {
+                            $video_source = 'youtube';
+                        } elseif ( strpos( $image_link, 'vimeo.com' ) !== false ) {
+                            $video_source = 'vimeo';
+                        }
+                    }
+                    
+                    if ( $image_type === 'video' || $image_type === 'url' ) : 
+                        $badge_class = 'pfg-image-type-badge';
+                        if ( $video_source === 'youtube' ) {
+                            $badge_class .= ' pfg-badge-youtube';
+                            $badge_title = __( 'YouTube Video', 'portfolio-filter-gallery' );
+                            $badge_icon = 'dashicons-youtube';
+                        } elseif ( $video_source === 'vimeo' ) {
+                            $badge_class .= ' pfg-badge-vimeo';
+                            $badge_title = __( 'Vimeo Video', 'portfolio-filter-gallery' );
+                            $badge_icon = 'dashicons-video-alt3';
+                        } elseif ( $image_type === 'video' ) {
+                            $badge_class .= ' pfg-badge-video';
+                            $badge_title = __( 'Video Lightbox', 'portfolio-filter-gallery' );
+                            $badge_icon = 'dashicons-video-alt3';
+                        } else {
+                            $badge_title = __( 'External Link', 'portfolio-filter-gallery' );
+                            $badge_icon = 'dashicons-external';
+                        }
+                    ?>
+                    <div class="<?php echo esc_attr( $badge_class ); ?>" title="<?php echo esc_attr( $badge_title ); ?>">
+                        <span class="dashicons <?php echo esc_attr( $badge_icon ); ?>"></span>
+                    </div>
+                    <?php endif; ?>
+                    
                     <img src="<?php echo esc_url( $thumb_url ); ?>" 
                          alt="<?php echo esc_attr( $title ); ?>" 
                          class="pfg-image-thumb"
@@ -447,6 +486,7 @@ $filter_tree = pfg_build_filter_tree_for_images( $filters );
                     <!-- Hidden inputs -->
                     <input type="hidden" name="pfg_images[<?php echo esc_attr( $index ); ?>][id]" value="<?php echo esc_attr( $image['id'] ); ?>">
                     <input type="hidden" name="pfg_images[<?php echo esc_attr( $index ); ?>][title]" value="<?php echo esc_attr( $title ); ?>">
+                    <input type="hidden" name="pfg_images[<?php echo esc_attr( $index ); ?>][alt]" value="<?php echo esc_attr( $image['alt'] ?? '' ); ?>">
                     <input type="hidden" name="pfg_images[<?php echo esc_attr( $index ); ?>][description]" value="<?php echo esc_attr( $image['description'] ?? '' ); ?>">
                     <input type="hidden" name="pfg_images[<?php echo esc_attr( $index ); ?>][link]" value="<?php echo esc_url( $image['link'] ?? '' ); ?>">
                     <input type="hidden" name="pfg_images[<?php echo esc_attr( $index ); ?>][type]" value="<?php echo esc_attr( $image['type'] ?? 'image' ); ?>">
@@ -493,6 +533,14 @@ $filter_tree = pfg_build_filter_tree_for_images( $filters );
                 </div>
                 
                 <div class="pfg-form-row">
+                    <label class="pfg-form-label">
+                        <?php esc_html_e( 'Alt Text', 'portfolio-filter-gallery' ); ?>
+                        <small><?php esc_html_e( 'Describes the image for accessibility and SEO', 'portfolio-filter-gallery' ); ?></small>
+                    </label>
+                    <input type="text" id="pfg-modal-alt" class="pfg-input">
+                </div>
+                
+                <div class="pfg-form-row">
                     <label class="pfg-form-label"><?php esc_html_e( 'Description', 'portfolio-filter-gallery' ); ?></label>
                     <textarea id="pfg-modal-description" class="pfg-textarea" rows="3"></textarea>
                 </div>
@@ -512,11 +560,14 @@ $filter_tree = pfg_build_filter_tree_for_images( $filters );
                 <div class="pfg-form-row pfg-link-url-row" style="display: none;">
                     <label class="pfg-form-label"><?php esc_html_e( 'URL', 'portfolio-filter-gallery' ); ?></label>
                     <div class="pfg-video-url-wrap">
-                        <input type="url" id="pfg-modal-link" class="pfg-input" placeholder="https://">
+                        <input type="text" id="pfg-modal-link" class="pfg-input" placeholder="https://" inputmode="url">
                         <small class="pfg-url-hint"></small>
-                        <button type="button" id="pfg-fetch-video-thumb" class="pfg-btn pfg-btn-secondary" style="margin-top: 8px; display: none;">
+                        <button type="button" id="pfg-fetch-video-thumb" class="pfg-btn pfg-btn-secondary" style="margin-top: 8px; display: none;"<?php echo ! pfg_is_premium() ? ' disabled title="' . esc_attr__( 'Upgrade to Pro to auto-fetch video thumbnails', 'portfolio-filter-gallery' ) . '"' : ''; ?>>
                             <span class="dashicons dashicons-format-video" style="margin-right: 5px;"></span>
                             <?php esc_html_e( 'Fetch Video Thumbnail', 'portfolio-filter-gallery' ); ?>
+                            <?php if ( ! pfg_is_premium() ) : ?>
+                                <span class="pfg-pro-badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; font-size: 9px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; font-weight: 600; text-transform: uppercase;">PRO</span>
+                            <?php endif; ?>
                         </button>
                         <button type="button" id="pfg-revert-thumb" class="pfg-btn pfg-btn-secondary" style="margin-top: 8px; margin-left: 8px; display: none;">
                             <span class="dashicons dashicons-undo" style="margin-right: 5px;"></span>
@@ -800,6 +851,44 @@ $filter_tree = pfg_build_filter_tree_for_images( $filters );
 .pfg-tag-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .pfg-tag-connector { color: #94a3b8; font-size: 10px; margin-right: -2px; }
 
+/* Type indicator badges */
+/* Type indicator badges */
+.pfg-image-type-badge {
+    position: absolute;
+    top: 118px; /* Position inside the 150px image area, 8px from bottom */
+    left: 8px;
+    z-index: 5;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #3858e9 0%, #667eea 100%);
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(56, 88, 233, 0.4);
+}
+.pfg-image-type-badge .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: #fff;
+}
+/* YouTube badge - red */
+.pfg-image-type-badge.pfg-badge-youtube {
+    background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+    box-shadow: 0 2px 6px rgba(255, 0, 0, 0.4);
+}
+/* Vimeo badge - cyan blue */
+.pfg-image-type-badge.pfg-badge-vimeo {
+    background: linear-gradient(135deg, #1ab7ea 0%, #0095d5 100%);
+    box-shadow: 0 2px 6px rgba(26, 183, 234, 0.4);
+}
+/* Generic video badge - orange/red */
+.pfg-image-type-badge.pfg-badge-video {
+    background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+}
+
 /* Selected state for bulk selection */
 .pfg-image-item.selected {
     border-color: #3858e9;
@@ -926,6 +1015,7 @@ jQuery(document).ready(function($) {
             var imageData = {
                 id: $item.find('input[name$="[id]"]').val() || $item.data('id'),
                 title: $item.find('input[name$="[title]"]').val() || '',
+                alt: $item.find('input[name$="[alt]"]').val() || '',
                 description: $item.find('input[name$="[description]"]').val() || '',
                 link: $item.find('input[name$="[link]"]').val() || '',
                 type: $item.find('input[name$="[type]"]').val() || 'image',
@@ -1165,6 +1255,7 @@ jQuery(document).ready(function($) {
         
         // Get values from hidden inputs
         var title = currentImageItem.find('input[name$="[title]"]').val() || '';
+        var alt = currentImageItem.find('input[name$="[alt]"]').val() || '';
         var description = currentImageItem.find('input[name$="[description]"]').val() || '';
         var link = currentImageItem.find('input[name$="[link]"]').val() || '';
         var type = currentImageItem.find('input[name$="[type]"]').val() || 'image';
@@ -1176,6 +1267,7 @@ jQuery(document).ready(function($) {
         // Populate modal
         $('#pfg-modal-image').attr('src', imgSrc);
         $('#pfg-modal-title').val(title);
+        $('#pfg-modal-alt').val(alt);
         $('#pfg-modal-description').val(description);
         $('#pfg-modal-type').val(type).trigger('change');
         $('#pfg-modal-link').val(link);
@@ -1250,6 +1342,7 @@ jQuery(document).ready(function($) {
         if (!currentImageItem) return;
         
         var title = $('#pfg-modal-title').val();
+        var alt = $('#pfg-modal-alt').val();
         var description = $('#pfg-modal-description').val();
         var type = $('#pfg-modal-type').val();
         var link = $('#pfg-modal-link').val();
@@ -1262,6 +1355,7 @@ jQuery(document).ready(function($) {
         
         // Update hidden inputs
         currentImageItem.find('input[name$="[title]"]').val(title);
+        currentImageItem.find('input[name$="[alt]"]').val(alt);
         currentImageItem.find('input[name$="[description]"]').val(description);
         currentImageItem.find('input[name$="[type]"]').val(type);
         currentImageItem.find('input[name$="[link]"]').val(link);
@@ -1297,6 +1391,44 @@ jQuery(document).ready(function($) {
             filtersContainer.html(filterTagsHtml);
         } else if (filterTagsHtml) {
             currentImageItem.find('.pfg-image-info').append('<div class="pfg-image-filters">' + filterTagsHtml + '</div>');
+        }
+        
+        // Update type badge (video/url indicator)
+        var existingBadge = currentImageItem.find('.pfg-image-type-badge');
+        if (type === 'video' || type === 'url') {
+            var badgeClass = 'pfg-image-type-badge';
+            var iconClass, titleText;
+            
+            if (type === 'video' && link) {
+                // Detect YouTube or Vimeo
+                if (link.indexOf('youtube.com') !== -1 || link.indexOf('youtu.be') !== -1) {
+                    badgeClass += ' pfg-badge-youtube';
+                    iconClass = 'dashicons-youtube';
+                    titleText = '<?php esc_attr_e( 'YouTube Video', 'portfolio-filter-gallery' ); ?>';
+                } else if (link.indexOf('vimeo.com') !== -1) {
+                    badgeClass += ' pfg-badge-vimeo';
+                    iconClass = 'dashicons-video-alt3';
+                    titleText = '<?php esc_attr_e( 'Vimeo Video', 'portfolio-filter-gallery' ); ?>';
+                } else {
+                    badgeClass += ' pfg-badge-video';
+                    iconClass = 'dashicons-video-alt3';
+                    titleText = '<?php esc_attr_e( 'Video Lightbox', 'portfolio-filter-gallery' ); ?>';
+                }
+            } else {
+                iconClass = 'dashicons-external';
+                titleText = '<?php esc_attr_e( 'External Link', 'portfolio-filter-gallery' ); ?>';
+            }
+            
+            var badgeHtml = '<div class="' + badgeClass + '" title="' + titleText + '"><span class="dashicons ' + iconClass + '"></span></div>';
+            
+            if (existingBadge.length) {
+                existingBadge.replaceWith(badgeHtml);
+            } else {
+                currentImageItem.find('.pfg-image-checkbox').after(badgeHtml);
+            }
+        } else {
+            // Remove badge for regular images
+            existingBadge.remove();
         }
     }
     
@@ -1410,8 +1542,16 @@ jQuery(document).ready(function($) {
     });
     
     // Fetch Video Thumbnail button click
-    $(document).on('click', '#pfg-fetch-video-thumb', function() {
+    $(document).on('click', '#pfg-fetch-video-thumb', function(e) {
         var $btn = $(this);
+        
+        // Check if premium (button is disabled for free users)
+        if ($btn.prop('disabled')) {
+            e.preventDefault();
+            alert('<?php esc_html_e( 'Upgrade to Pro to auto-fetch video thumbnails from YouTube, Vimeo, and more!', 'portfolio-filter-gallery' ); ?>');
+            return;
+        }
+        
         var $status = $('#pfg-fetch-thumb-status');
         var videoUrl = $('#pfg-modal-link').val();
         

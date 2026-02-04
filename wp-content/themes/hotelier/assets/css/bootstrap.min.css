@@ -18,7 +18,7 @@
     --bs-white: #fff;
     --bs-gray: #6c757d;
     --bs-gray-dark: #343a40;
-    --bs-primary: #FEA116;
+    --bs-primary: darkgoldenrod;
     --bs-secondary: #6c757d;
     --bs-success: #198754;
     --bs-info: #0dcaf0;
@@ -232,12 +232,12 @@ sup {
 }
 
 a {
-    color: #FEA116;
+    color: darkgoldenrod;
     text-decoration: none
 }
 
 a:hover {
-    color: #cb8112
+    color: darkgoldenrod
 }
 
 a:not([href]):not([class]),
@@ -8289,7 +8289,7 @@ fieldset:disabled .btn {
 }
 
 .text-primary {
-    color: #FEA116 !important
+    color: darkgoldenrod !important
 }
 
 .text-secondary {

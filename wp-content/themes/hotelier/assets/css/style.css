@@ -496,6 +496,7 @@
     
     height: 150px;
     padding-left: 100px;
+    padding-bottom: 0%;
 
 }
 .custom-logo-footer img {
@@ -503,6 +504,22 @@
     height: 150px;
     padding: auto;
 
+}
+
+@media (max-width: 991.98px){
+   .custom-logo img {
+    
+    height: 100px;
+    padding-left: 10px;
+    
+
+}
+.custom-logo-footer img {
+    
+    height: 150px;
+    padding: auto;
+
+} 
 }
 
 /* menu */
@@ -515,12 +532,30 @@
         margin-top: 40px;
     }
 
-    #menu-primary-menu>li>a {
+    #menu-primary-menu>li>a 
+    {
         padding: 12px 0;
         color: #000000;
         padding: 15px;
         width: 100%;
     }
+    #menu-menu-bulgaria>li>a{
+        padding: 12px 0;
+        color: #000000;
+        padding: 15px;
+        width: 100%;
+    }
+    #menu-primary-menu>li>a:hover{
+        color: darkgoldenrod !important;
+    }
+    #menu-menu-bulgaria>li>a:hover{
+        color: darkgoldenrod !important;
+    }
+    .current-menu-item > a {
+        color: darkgoldenrod !important;
+       
+    }
+    
 }
 
 /* Mobile View */
@@ -530,7 +565,8 @@
     }
 
 
-    #menu-primary-menu {
+    #menu-primary-menu & 
+    {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
@@ -538,7 +574,21 @@
         padding: 1rem 0;
     }
 
-    #menu-primary-menu>li {
+    #menu-menu-bulgaria{
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        padding: 1rem 0;
+    }
+
+    #menu-primary-menu>li 
+    {
+        margin-right: 0;
+        width: 100%;
+        border-bottom: 1px solid #eee;
+    }
+    #menu-menu-bulgaria>li {
         margin-right: 0;
         width: 100%;
         border-bottom: 1px solid #eee;
@@ -550,11 +600,31 @@
         width: 100%;
     }
 
+    #menu-menu-bulgaria>li>a {
+        padding: 12px;
+        color: #000000 !important;
+        width: 100%;
+    }
+   
+    #menu-primary-menu>li>a:hover{
+        color: darkgoldenrod !important;
+    }
+
+    #menu-menu-bulgaria>li>a:hover{
+        color: darkgoldenrod !important;
+    }
+     .current-menu-item > a {
+        color: darkgoldenrod !important;
+       
+    }
+
 }
 
 .text-justify {
     text-align: justify;
-    line-height: 1.7;
+    line-height: 1.9;
+    color: black;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 /* gallery style */

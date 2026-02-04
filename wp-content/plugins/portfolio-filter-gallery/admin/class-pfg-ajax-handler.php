@@ -43,6 +43,7 @@ class PFG_Ajax_Handler {
         add_action( 'wp_ajax_pfg_run_migration', array( $this, 'run_migration' ) );
         add_action( 'wp_ajax_pfg_restore_backup', array( $this, 'restore_backup' ) );
         add_action( 'wp_ajax_pfg_get_migration_status', array( $this, 'get_migration_status' ) );
+        add_action( 'wp_ajax_pfg_force_remigrate', array( $this, 'force_remigrate' ) );
         
         // Source preview action
         add_action( 'wp_ajax_pfg_preview_source', array( $this, 'preview_source' ) );
@@ -829,9 +830,12 @@ class PFG_Ajax_Handler {
 
             if ( ! $exists ) {
                 $attachment = get_post( $image_id );
+                // Get alt text from attachment meta
+                $alt_text = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
                 $new_image = array(
                     'id'          => $image_id,
                     'title'       => $attachment ? $attachment->post_title : '',
+                    'alt'         => $alt_text ? $alt_text : '',
                     'description' => $attachment ? $attachment->post_content : '',
                     'link'        => '',
                     'type'        => 'image',
@@ -906,9 +910,12 @@ class PFG_Ajax_Handler {
             
             if ( ! is_wp_error( $attachment_id ) ) {
                 $attachment = get_post( $attachment_id );
+                // Get alt text from attachment meta
+                $alt_text = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
                 $new_image = array(
                     'id'          => $attachment_id,
                     'title'       => $attachment ? $attachment->post_title : '',
+                    'alt'         => $alt_text ? $alt_text : '',
                     'description' => $attachment ? $attachment->post_content : '',
                     'link'        => '',
                     'type'        => 'image',
@@ -1198,6 +1205,47 @@ class PFG_Ajax_Handler {
         $migrator = new PFG_Migrator();
 
         wp_send_json_success( $migrator->get_status() );
+    }
+    
+    /**
+     * Force re-migrate galleries to repair incomplete data.
+     */
+    public function force_remigrate() {
+        PFG_Security::verify_ajax_nonce( 'admin_action' );
+
+        if ( ! PFG_Security::is_admin() ) {
+            wp_send_json_error( array( 'message' => __( 'Only administrators can run migrations.', 'portfolio-filter-gallery' ) ), 403 );
+        }
+
+        $gallery_id = isset( $_POST['gallery_id'] ) ? absint( $_POST['gallery_id'] ) : 0;
+        
+        $migrator = new PFG_Migrator();
+        
+        if ( $gallery_id ) {
+            // Re-migrate single gallery
+            $result = $migrator->force_remigrate_gallery( $gallery_id );
+            
+            if ( $result ) {
+                // Mark migration as completed to hide the re-migrate button
+                update_post_meta( $gallery_id, '_pfg_migration_completed', true );
+                
+                wp_send_json_success( array(
+                    'message' => sprintf( __( 'Gallery #%d re-migrated successfully.', 'portfolio-filter-gallery' ), $gallery_id ),
+                ) );
+            } else {
+                wp_send_json_error( array( 
+                    'message' => sprintf( __( 'No legacy data found for gallery #%d.', 'portfolio-filter-gallery' ), $gallery_id ),
+                ) );
+            }
+        } else {
+            // Re-migrate all galleries
+            $count = $migrator->force_remigrate_all();
+            
+            wp_send_json_success( array(
+                'message' => sprintf( __( '%d galleries re-migrated successfully.', 'portfolio-filter-gallery' ), $count ),
+                'count'   => $count,
+            ) );
+        }
     }
 
     /**

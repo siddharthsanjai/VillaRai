@@ -200,7 +200,7 @@ class PFG_Migrator {
             return false;
         }
 
-        // Check if already migrated
+        // Check if already migrated to current version
         $migrated = get_post_meta( $gallery_id, '_pfg_migrated', true );
         if ( $migrated === self::CURRENT_VERSION ) {
             return true;
@@ -219,10 +219,14 @@ class PFG_Migrator {
         // Use Gallery class to handle transformation
         $gallery = new PFG_Gallery( $gallery_id );
         
-        // Extract images and save separately
-        $images = $gallery->get_images();
-        if ( ! empty( $images ) ) {
-            update_post_meta( $gallery_id, '_pfg_images', $images );
+        // IMPORTANT: Force re-extract images directly from legacy data
+        // This ensures alt, link, description are properly migrated even if
+        // _pfg_images already exists with incomplete data from a previous migration
+        if ( isset( $legacy['image-ids'] ) && is_array( $legacy['image-ids'] ) ) {
+            $images = $this->extract_images_from_legacy( $legacy, $gallery_id );
+            if ( ! empty( $images ) ) {
+                update_post_meta( $gallery_id, '_pfg_images', $images );
+            }
         }
 
         // Save new format settings
@@ -233,10 +237,230 @@ class PFG_Migrator {
 
         // Mark as migrated
         update_post_meta( $gallery_id, '_pfg_migrated', self::CURRENT_VERSION );
+        
+        // Mark migration as completed (hides re-migrate button in UI)
+        update_post_meta( $gallery_id, '_pfg_migration_completed', true );
 
         $this->log( "Migrated gallery #{$gallery_id}" );
 
         return true;
+    }
+    
+    /**
+     * Extract images from legacy data format.
+     * This method ensures all fields (alt, link, description) are properly extracted.
+     *
+     * @param array $legacy     Legacy settings array.
+     * @param int   $gallery_id Gallery ID for filter mapping.
+     * @return array Transformed images array.
+     */
+    protected function extract_images_from_legacy( $legacy, $gallery_id ) {
+        $images = array();
+
+        if ( ! isset( $legacy['image-ids'] ) || ! is_array( $legacy['image-ids'] ) ) {
+            return $images;
+        }
+
+        $image_ids   = $legacy['image-ids'];
+        $titles      = isset( $legacy['image_title'] ) ? $legacy['image_title'] : array();
+        
+        // Note: Legacy uses 'image-desc' (hyphen, indexed array)
+        $descs       = isset( $legacy['image-desc'] ) ? $legacy['image-desc'] : array();
+        
+        // Note: Legacy uses 'slide-alt' (keyed by image ID)
+        $alts        = isset( $legacy['slide-alt'] ) ? $legacy['slide-alt'] : array();
+        
+        // Note: Legacy uses 'image-link' (keyed by image ID)
+        $links       = isset( $legacy['image-link'] ) ? $legacy['image-link'] : array();
+        
+        // Note: Legacy uses 'slide-type' (keyed by image ID)
+        $types       = isset( $legacy['slide-type'] ) ? $legacy['slide-type'] : array();
+        
+        $filters     = isset( $legacy['filters'] ) ? $legacy['filters'] : array();
+
+        // Build filter slug map
+        $filter_id_to_slug = $this->build_legacy_filter_map();
+
+        foreach ( $image_ids as $index => $id ) {
+            $id = absint( $id );
+            if ( ! $id ) {
+                continue;
+            }
+
+            // Try both index and id as keys for legacy compatibility
+            $legacy_filter_ids = array();
+            if ( isset( $filters[ $index ] ) && is_array( $filters[ $index ] ) ) {
+                $legacy_filter_ids = array_map( 'absint', $filters[ $index ] );
+            } elseif ( isset( $filters[ $id ] ) && is_array( $filters[ $id ] ) ) {
+                $legacy_filter_ids = array_map( 'absint', $filters[ $id ] );
+            }
+
+            // Convert legacy filter IDs to filter slugs
+            $filter_slugs = array();
+            foreach ( $legacy_filter_ids as $filter_id ) {
+                if ( isset( $filter_id_to_slug[ $filter_id ] ) ) {
+                    $filter_slugs[] = $filter_id_to_slug[ $filter_id ];
+                }
+            }
+
+            // Get alt text: Legacy 'slide-alt' is keyed by image ID, not index
+            // Try by image ID first, then by index, then fall back to attachment meta
+            $alt_text = '';
+            if ( isset( $alts[ $id ] ) && ! empty( $alts[ $id ] ) ) {
+                $alt_text = $alts[ $id ];
+            } elseif ( isset( $alts[ $index ] ) && ! empty( $alts[ $index ] ) ) {
+                $alt_text = $alts[ $index ];
+            } else {
+                // Fall back to WordPress attachment alt text
+                $alt_text = get_post_meta( $id, '_wp_attachment_image_alt', true );
+            }
+            
+            // Get description: Legacy 'image-desc' is indexed array
+            $description = '';
+            if ( isset( $descs[ $index ] ) && ! empty( $descs[ $index ] ) ) {
+                $description = $descs[ $index ];
+            }
+            
+            // Get link: Legacy 'image-link' is keyed by image ID
+            $link = '';
+            if ( isset( $links[ $id ] ) && ! empty( $links[ $id ] ) ) {
+                $link = $links[ $id ];
+            } elseif ( isset( $links[ $index ] ) && ! empty( $links[ $index ] ) ) {
+                $link = $links[ $index ];
+            }
+            
+            // Get type: Legacy 'slide-type' is keyed by image ID
+            // In legacy: 'image' = lightbox, 'video' = video lightbox
+            // In new format: 'image' = lightbox, 'video' = video lightbox, 'url' = external link
+            // If legacy type is 'image' but has a link URL, it means external link (type='url')
+            $type = 'image';
+            if ( isset( $types[ $id ] ) && ! empty( $types[ $id ] ) ) {
+                $type = $types[ $id ];
+            } elseif ( isset( $types[ $index ] ) && ! empty( $types[ $index ] ) ) {
+                $type = $types[ $index ];
+            }
+            
+            // Convert legacy 'image' type with link to new 'url' type (external link)
+            if ( $type === 'image' && ! empty( $link ) ) {
+                $type = 'url';
+            }
+
+            $images[] = array(
+                'id'          => $id,
+                'title'       => isset( $titles[ $index ] ) ? $titles[ $index ] : get_the_title( $id ),
+                'alt'         => $alt_text,
+                'description' => $description,
+                'link'        => $link,
+                'type'        => $type,
+                'filters'     => $filter_slugs,
+            );
+        }
+
+        return $images;
+    }
+    
+    /**
+     * Build legacy filter ID to slug mapping.
+     *
+     * @return array Map of filter ID => slug.
+     */
+    protected function build_legacy_filter_map() {
+        $map = array();
+        
+        // Get new format filters
+        $new_filters = get_option( 'pfg_filters', array() );
+        foreach ( $new_filters as $filter ) {
+            if ( isset( $filter['id'] ) && isset( $filter['slug'] ) ) {
+                // Extract numeric ID from the filter ID if present
+                $parts = explode( '_', $filter['id'] );
+                $numeric_id = absint( $parts[0] );
+                if ( $numeric_id ) {
+                    $map[ $numeric_id ] = $filter['slug'];
+                }
+                // Also map by full ID
+                $map[ $filter['id'] ] = $filter['slug'];
+            }
+        }
+        
+        // Get legacy filters and try to match by name
+        $legacy_filters = get_option( 'awl_portfolio_filter_gallery_categories', array() );
+        foreach ( $legacy_filters as $legacy_id => $legacy_name ) {
+            if ( ! isset( $map[ $legacy_id ] ) ) {
+                // Try to find matching new filter by name
+                foreach ( $new_filters as $filter ) {
+                    if ( isset( $filter['name'] ) && $filter['name'] === $legacy_name ) {
+                        $map[ $legacy_id ] = $filter['slug'];
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return $map;
+    }
+    
+    /**
+     * Force re-migrate a single gallery, even if already migrated.
+     * This is useful for repairing galleries that were migrated with incomplete data.
+     *
+     * @param int $gallery_id Gallery post ID.
+     * @return bool
+     */
+    public function force_remigrate_gallery( $gallery_id ) {
+        $gallery_id = absint( $gallery_id );
+        
+        if ( ! $gallery_id ) {
+            return false;
+        }
+
+        // Get legacy settings (original or backup)
+        $legacy_key = 'awl_filter_gallery' . $gallery_id;
+        $legacy     = get_post_meta( $gallery_id, $legacy_key, true );
+        
+        // Try backup if original is empty
+        if ( empty( $legacy ) ) {
+            $legacy = get_post_meta( $gallery_id, '_pfg_legacy_backup', true );
+        }
+
+        if ( empty( $legacy ) || ! isset( $legacy['image-ids'] ) ) {
+            $this->log( "No legacy data found for gallery #{$gallery_id}" );
+            return false;
+        }
+
+        // Force extract images from legacy
+        $images = $this->extract_images_from_legacy( $legacy, $gallery_id );
+        if ( ! empty( $images ) ) {
+            update_post_meta( $gallery_id, '_pfg_images', $images );
+            $this->log( "Force re-migrated gallery #{$gallery_id} with " . count( $images ) . " images" );
+            return true;
+        }
+
+        return false;
+    }
+    
+    /**
+     * Force re-migrate all galleries.
+     * This is useful for repairing all galleries that were migrated with incomplete data.
+     *
+     * @return int Number of galleries re-migrated.
+     */
+    public function force_remigrate_all() {
+        $galleries = get_posts( array(
+            'post_type'      => 'awl_filter_gallery',
+            'posts_per_page' => -1,
+            'post_status'    => 'any',
+            'fields'         => 'ids',
+        ) );
+
+        $count = 0;
+        foreach ( $galleries as $gallery_id ) {
+            if ( $this->force_remigrate_gallery( $gallery_id ) ) {
+                $count++;
+            }
+        }
+
+        $this->log( "Force re-migrated {$count} galleries" );
+        return $count;
     }
 
     /**

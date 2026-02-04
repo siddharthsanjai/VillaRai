@@ -92,7 +92,80 @@ $gallery_id = $post->ID;
     </div>
     <?php endif; ?>
     
+    <div class="pfg-gallery-tools">
+        <h4><?php esc_html_e( 'Gallery Tools', 'portfolio-filter-gallery' ); ?></h4>
+        
+        <div class="pfg-tool-row">
+            <div class="pfg-tool-info">
+                <strong><?php esc_html_e( 'Force Re-migrate', 'portfolio-filter-gallery' ); ?></strong>
+                <p><?php esc_html_e( 'Re-import data from legacy format. Use if alt text, descriptions, or links are missing after upgrade.', 'portfolio-filter-gallery' ); ?></p>
+            </div>
+            <button type="button" id="pfg-force-remigrate-btn" class="pfg-btn pfg-btn-secondary" data-gallery-id="<?php echo esc_attr( $gallery_id ); ?>">
+                <span class="dashicons dashicons-update"></span>
+                <?php esc_html_e( 'Re-migrate This Gallery', 'portfolio-filter-gallery' ); ?>
+            </button>
+        </div>
+        
+        <div id="pfg-remigrate-status" style="display: none; margin-top: 10px; padding: 10px; border-radius: 6px;"></div>
+    </div>
+    
 </div>
+
+<script>
+jQuery(document).ready(function($) {
+    $('#pfg-force-remigrate-btn').on('click', function() {
+        var $btn = $(this);
+        var $status = $('#pfg-remigrate-status');
+        var galleryId = $btn.data('gallery-id');
+        
+        if (!confirm('<?php esc_html_e( 'This will re-import data from the legacy format, overwriting current values. Continue?', 'portfolio-filter-gallery' ); ?>')) {
+            return;
+        }
+        
+        $btn.prop('disabled', true).find('.dashicons').addClass('pfg-spin');
+        $status.hide();
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'pfg_force_remigrate',
+                security: '<?php echo wp_create_nonce( 'pfg_admin_action' ); ?>',
+                gallery_id: galleryId
+            },
+            success: function(response) {
+                $btn.prop('disabled', false).find('.dashicons').removeClass('pfg-spin');
+                
+                if (response.success) {
+                    $status.css({
+                        'background': '#dcfce7',
+                        'border': '1px solid #86efac',
+                        'color': '#166534'
+                    }).html('<span class="dashicons dashicons-yes-alt" style="margin-right: 5px;"></span>' + response.data.message).show();
+                    
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    $status.css({
+                        'background': '#fef2f2',
+                        'border': '1px solid #fecaca',
+                        'color': '#991b1b'
+                    }).html('<span class="dashicons dashicons-warning" style="margin-right: 5px;"></span>' + response.data.message).show();
+                }
+            },
+            error: function() {
+                $btn.prop('disabled', false).find('.dashicons').removeClass('pfg-spin');
+                $status.css({
+                    'background': '#fef2f2',
+                    'border': '1px solid #fecaca',
+                    'color': '#991b1b'
+                }).html('<span class="dashicons dashicons-warning" style="margin-right: 5px;"></span><?php esc_html_e( 'An error occurred. Please try again.', 'portfolio-filter-gallery' ); ?>').show();
+            }
+        });
+    });
+});
+</script>
 
 <style>
 .pfg-params-table {
@@ -128,5 +201,45 @@ $gallery_id = $post->ID;
     display: flex;
     align-items: center;
     gap: 8px;
+}
+.pfg-gallery-tools {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+.pfg-gallery-tools h4 {
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    color: #334155;
+}
+.pfg-tool-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+}
+.pfg-tool-info {
+    flex: 1;
+}
+.pfg-tool-info strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #334155;
+}
+.pfg-tool-info p {
+    margin: 0;
+    font-size: 12px;
+    color: #64748b;
+}
+.pfg-spin {
+    animation: pfg-spin 1s linear infinite;
+}
+@keyframes pfg-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 </style>

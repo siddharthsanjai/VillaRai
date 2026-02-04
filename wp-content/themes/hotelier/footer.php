@@ -65,7 +65,8 @@
                 <div class="row">
                     <div class="text-center mb-3 mb-md-0">
                         &copy; <a class="border-bottom" href="#">Copyright © 2026 Хотел "Вила Рай"</a>
-                        <p>By using our website, you agree to our <a href="<?php echo site_url('/terms-and-conditions/'); ?>">Terms and Conditions</a>.</p>
+                        <p>By using our website, you agree to our <a
+                                href="<?php echo site_url('/terms-and-conditions/'); ?>">Terms and Conditions</a>.</p>
 
                         <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
                         <!-- Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a>
