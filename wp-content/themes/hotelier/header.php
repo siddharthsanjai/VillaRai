@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <title>VillaRai</title>
@@ -10,8 +9,15 @@
     <link href="assets/img/villa-logo.png" rel="icon">
     <?php
     wp_head();
+    $current_lang = pll_current_language();
+        if ($current_lang == 'en') {
+            $logo = get_template_directory_uri() . '/assets/img/Logo_Vila-Rai_B.png.webp';
+            $logo_class = "custom-logo img";
+        } else {
+            $logo = get_template_directory_uri() . '/assets/img/Villa_logo_BG.svg';
+            $logo_class = "logo-bg";
+        }
     ?>
-
 </head>
 
 <body>
@@ -34,8 +40,9 @@
                     <a href="<?php echo home_url(); ?>"
                         class="navbar-brand w-80 h-80 m-0 p-0 d-flex justify-content-center ">
                         <h1 class="custom-logo"><img
-                                src="<?php echo get_template_directory_uri(); ?>/assets/img/Logo_Vila-Rai_B.png"
-                                alt="VillaRai Logo">
+                                src="<?php echo $logo; ?>"
+                                alt="VillaRai Logo"
+                                class="<?php echo $logo_class; ?>">
                         </h1>
                     </a>
                 </div>
@@ -67,8 +74,10 @@
                     <nav class="navbar navbar-expand-lg bg-white navbar-light p-0 p-lg-0">
                         <a href="<?php echo home_url(); ?>" class="navbar-brand d-block d-lg-none">
                             <h2 class="custom-logo"><img
-                                    src="<?php echo get_template_directory_uri(); ?>/assets/img/Logo_Vila-Rai_B.png"
-                                    alt="VillaRai Logo"></h2>
+                                    src="<?php echo $logo; ?>"
+                                    alt="VillaRai Logo"
+                                    class="<?php echo $logo_class; ?>">
+                            </h2>
                             <!-- <h1 class="m-0 text-primary text-uppercase">VillaRai</h1> -->
 
                         </a>

@@ -46,7 +46,7 @@
 
 .btn.btn-primary,
 .btn.btn-secondary {
-    background-color: #5D0C1D;
+    background-color: #004a31;
     color: #FFFFFF;
 }
 
@@ -499,6 +499,14 @@
     padding-bottom: 0%;
 
 }
+
+.logo-bg{
+    height: 105px !important;
+    padding-left: 70px !important;
+    padding-top: 15px !important;
+    margin-top: 10px !important;
+    margin-bottom: 15px !important;
+}
 .custom-logo-footer img {
     
     height: 150px;
@@ -510,16 +518,22 @@
    .custom-logo img {
     
     height: 100px;
-    padding-left: 10px;
-    
+    padding-left: 10px; 
 
 }
-.custom-logo-footer img {
+    .custom-logo-footer img {
     
     height: 150px;
     padding: auto;
 
 } 
+    .logo-bg{
+    height: 80px !important;
+    padding-left: 10px !important;
+    padding-top: 10px !important;
+    margin-top: 10px !important;
+    margin-bottom: 15px !important;
+    }
 }
 
 /* menu */
@@ -721,12 +735,12 @@
 }
 
 .button-form>submit {
-    background-color: #5D0C1D;
+    background-color: #004a31;
     color: white;
 }
 
 .ff-btn-submit {
-    background-color: #5D0C1D !important;
+    background-color: #004a31 !important;
     color: white;
 }
 
@@ -745,15 +759,24 @@
 .wne{
     height: 600px;
 }
+@media (max-width: 992px) {
+    .wne{
+        height: 230px;
+    }
+}
 .pfg-filters > button{
     background-color: #ffffff;
     color: rgb(0, 0, 0);
 }
 .pfg-filters > button.pfg-filter--active{
-    background-color: #5D0C1D;
+    background-color: #004a31;
     color: #ffffff;
 }
 .pfg-filters > button:hover{
-    background-color: #5D0C1D;
+    background-color: #004a31;
     color: #ffffff;
 }
+.accommodation{
+    width: 2000px !important;
+}
+

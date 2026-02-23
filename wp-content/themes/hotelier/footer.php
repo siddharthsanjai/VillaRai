@@ -1,3 +1,20 @@
+<?php
+$lang = pll_current_language();
+
+if ($lang == 'bg') {
+    $terms_page_id = 254; // Bulgarian page ID
+    $location = "Вила Рай 4921 Мадан, България 41.522051, 24.957311";
+    $logo = get_template_directory_uri() . '/assets/img/footer-logo-bg.png';
+    $tnc = "Използвайки нашия уебсайт, Вие се съгласявате с";
+} else {
+    $terms_page_id = 199; // English page ID
+    $location = "Villa Rai 4921 Madan, Bulgaria 41.522051, 24.957311";
+    $logo = get_template_directory_uri() . '/assets/img/footerlogo.png';
+    $tnc = "By using our website, you agree to our";
+}
+
+
+?>
 <footer>
     <div class="container-fluid bg-dark text-light footer wow fadeIn" data-wow-delay="0.1s">
         <div class="container pb-5">
@@ -8,21 +25,38 @@
                     <p class="mb-2"><i class="fa fa-phone-alt me-3"></i>+359 888 513570,
                         +359 887 502222</p>
                     <p class="mb-2"><i class="fa fa-envelope me-3"></i>hotelvillarai@gmail.com</p>
-                    <p><i class="fa fa-map-marker-alt me-3"></i>Villa Rai 4921 Madan, Bulgaria
-                        41.522051, 24.957311</p>
+                    <p><i class="fa fa-map-marker-alt me-3"></i>
+                        <a href="https://maps.google.com/?q=41.5223403,24.9548565" class="text-white"
+                            target="_blank"><?php echo $location; ?></a>
+                    </p>
 
                 </div>
-
                 <div class="col-md-4 col-lg-4 d-flex justify-content-center">
                     <div class="rounded">
-                        <h1 class="custom-logo-footer"><img
-                                src="<?php echo get_template_directory_uri(); ?>/assets/img/footerlogo.png"
-                                alt="VillaRai Logo"></h1>
+                        <h1 class="custom-logo-footer"><img src="<?php echo $logo; ?>" alt="VillaRai Logo"></h1>
                         <div class="d-flex justify-content-center">
-                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-youtube"></i></a>
-                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-linkedin-in"></i></a>
+                            <a class="btn btn-outline-light btn-social" href="https://www.facebook.com/villarai.rhodope"
+                                target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+
+                            <a class="btn btn-outline-light btn-social" href="https://www.instagram.com/hotelvillarai/"
+                                target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+
+                            <a class="btn btn-outline-light btn-social"
+                                href="https://www.google.com/maps/place/%D0%92%D0%B8%D0%BB%D0%B0+%D0%A0%D0%B0%D0%B9/@41.5222162,24.9574104,17z/data=!3m1!4b1!4m9!3m8!1s0x14adac7f33af2da7:0x15965e462fb9b7a8!5m2!4m1!1i2!8m2!3d41.5222162!4d24.9574104!16s%2Fg%2F11bcdzbwbc?entry=ttu&g_ep=EgoyMDI2MDIxNi4wIKXMDSoASAFQAw%3D%3D"
+                                target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-google"></i>
+                            </a>
+
+                            <a class="btn btn-outline-light btn-social"
+                                href="https://www.tripadvisor.com/Hotel_Review-g2100960-d23174428-Reviews-Hotel_Villa_Rai-Madan_Smolyan_Province.html"
+                                target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-tripadvisor"></i>
+                            </a>
+
                         </div>
                         <!-- <p class="text-white mb-0">
                                 Download <a class="text-dark fw-medium" href="https://htmlcodex.com/hotel-html-template-pro">Hotelier – Premium Version</a>, build a professional website for your hotel business and grab the attention of new visitors upon your site’s launch.
@@ -64,9 +98,11 @@
             <div class="copyright">
                 <div class="row">
                     <div class="text-center mb-3 mb-md-0">
-                        &copy; <a class="border-bottom" href="#">Copyright © 2026 Хотел "Вила Рай"</a>
-                        <p>By using our website, you agree to our <a
-                                href="<?php echo site_url('/terms-and-conditions/'); ?>">Terms and Conditions</a>.</p>
+                        &copy; <a href="/">Copyright © 2026 Хотел "Вила Рай"</a>
+                        <p><?php echo $tnc; ?> <a class="border-bottom" href="<?php echo get_permalink($terms_page_id); ?>"><?php
+                               $lang = pll_current_language();
+                               echo ($lang == 'bg') ? 'Общи условия' : 'Terms and Conditions';
+                               ?></a>.</p>
 
                         <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
                         <!-- Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a>

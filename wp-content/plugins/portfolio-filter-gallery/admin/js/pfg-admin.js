@@ -379,8 +379,23 @@
                 },
                 success: function(response) {
                     if (response.success) {
+                        // Remove from master array BEFORE removing from DOM
+                        if (typeof window.pfgRemoveImageFromMaster === 'function') {
+                            window.pfgRemoveImageFromMaster(imageId);
+                        }
+                        
                         $item.fadeOut(300, function() {
                             $(this).remove();
+                            
+                            // Mark as structurally modified
+                            if (typeof window.pfgMarkImagesModified === 'function') {
+                                window.pfgMarkImagesModified();
+                            }
+                            
+                            // Update pagination UI
+                            if (typeof window.pfgUpdatePaginationUI === 'function') {
+                                window.pfgUpdatePaginationUI();
+                            }
                         });
                     } else {
                         PFGAdmin.showNotice('error', response.data.message);
@@ -412,6 +427,8 @@
                 order.push($(this).data('id'));
             });
 
+            console.log('PFG Free: updateImageOrder called with ' + order.length + ' images');
+
             $.ajax({
                 url: pfgAdmin.ajaxUrl,
                 type: 'POST',
@@ -423,9 +440,18 @@
                 }
             });
             
+            // Reorder master array to ensure save works correctly
+            if (typeof window.pfgReorderMasterArray === 'function') {
+                window.pfgReorderMasterArray(order);
+                console.log('PFG Free: Master array reordered via pfgReorderMasterArray');
+            } else {
+                console.error('PFG Free: pfgReorderMasterArray function NOT FOUND!');
+            }
+            
             // Mark images as modified for chunked save
             if (typeof window.pfgMarkImagesModified === 'function') {
                 window.pfgMarkImagesModified();
+                console.log('PFG Free: Images marked as modified');
             }
         },
 
@@ -622,15 +648,39 @@
             // Get current highest index
             let currentIndex = $('.pfg-image-item').length;
             
+            // Get reference to masterImagesArray for adding new images
+            const masterImages = (typeof window.pfgGetMasterImages === 'function') ? window.pfgGetMasterImages() : null;
+            
             images.forEach(function(image) {
                 const html = PFGAdmin.getImageItemHtml(image, currentIndex);
                 $grid.append(html);
                 currentIndex++;
+                
+                // Push new image into masterImagesArray so it's included on save
+                if (masterImages) {
+                    masterImages.push({
+                        id: image.id,
+                        title: image.title || '',
+                        alt: image.alt || '',
+                        description: image.description || '',
+                        link: image.link || '',
+                        type: image.type || 'image',
+                        filters: image.filters || '',
+                        product_id: image.product_id || '',
+                        product_name: image.product_name || '',
+                        original_id: image.original_id || image.id
+                    });
+                }
             });
             
             // Show bulk actions bar if we have images
             if ($('.pfg-image-item').length > 0) {
                 $('#pfg-bulk-actions').css('display', 'flex');
+            }
+            
+            // Update pagination counts
+            if (typeof window.pfgUpdatePaginationUI === 'function') {
+                window.pfgUpdatePaginationUI();
             }
             
             // Mark images as modified for chunked save

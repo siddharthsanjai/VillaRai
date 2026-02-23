@@ -172,6 +172,34 @@ function mytheme_assets()
 
 add_action('wp_enqueue_scripts', 'mytheme_assets');
 
+function villarai_gallery_filter_url_script() {
+    ?>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const buttons = document.querySelectorAll('.pfg-filter');
+
+        buttons.forEach(function(button) {
+
+            button.addEventListener('click', function() {
+
+                const filterValue = this.getAttribute('data-filter');
+
+                if (filterValue === "*") {
+                    window.history.pushState({}, '', window.location.pathname);
+                } else {
+                    const newUrl = window.location.pathname + '?filter=' + filterValue;
+                    window.history.pushState({}, '', newUrl);
+                }
+
+            });
+
+        });
+
+    });
+    </script>
+    <?php
+}
+add_action('wp_footer', 'villarai_gallery_filter_url_script');
 
 
-?>
