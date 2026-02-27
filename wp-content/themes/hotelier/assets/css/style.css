@@ -159,7 +159,12 @@
 /*** Section Title ***/
 .section-title {
     position: relative;
+    font-family: 'charter' !important;
+    color: #b2822d;
     display: inline-block;
+}
+.mb-5 {
+    color: #b2822d;
 }
 
 .section-title::before {
@@ -637,8 +642,8 @@
 .text-justify {
     text-align: justify;
     line-height: 1.9;
-    color: black;
-    font-family: Arial, Helvetica, sans-serif;
+    color: #000000;
+    font-family: 'Charter' !important;
 }
 
 /* gallery style */
@@ -663,7 +668,9 @@
 
 .text-wine {
     text-align: justify;
+    color: #000000;
     line-height: 1.7;
+    font-family: 'Charter' !important;
 }
 
 @media (max-width: 992px) {
@@ -764,9 +771,11 @@
         height: 230px;
     }
 }
+
 .pfg-filters > button{
     background-color: #ffffff;
     color: rgb(0, 0, 0);
+    font-family: 'Charter' !important;
 }
 .pfg-filters > button.pfg-filter--active{
     background-color: #004a31;
@@ -780,3 +789,39 @@
     width: 2000px !important;
 }
 
+@font-face {
+    font-family: 'Charter';
+    src: url('../fonts/Charter.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'charter';
+    src: url('../fonts/Charter.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+h3{
+    color: #b2822d;
+}
+h4{
+    color: #b2822d;
+}
+.text-center {
+    text-align: center;
+    color: #b2822d;
+    line-height: 1.7;
+    font-family: 'Charter' !important;
+}
+.text-room{
+    color: #b2822d;
+}
+p{
+    font-family: 'Charter' !important;
+}
+.wp-block-heading{
+    color: black;
+}
+.wp-block-heading>a{
+    color: black;
+}

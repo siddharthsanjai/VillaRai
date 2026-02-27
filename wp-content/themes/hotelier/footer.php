@@ -97,7 +97,7 @@ if ($lang == 'bg') {
         <div class="container">
             <div class="copyright">
                 <div class="row">
-                    <div class="text-center mb-3 mb-md-0">
+                    <div class="text-center text-white mb-3 mb-md-0">
                         &copy; <a href="/">Copyright © 2026 Хотел "Вила Рай"</a>
                         <p><?php echo $tnc; ?> <a class="border-bottom" href="<?php echo get_permalink($terms_page_id); ?>"><?php
                                $lang = pll_current_language();
