@@ -202,4 +202,13 @@ function villarai_gallery_filter_url_script() {
 }
 add_action('wp_footer', 'villarai_gallery_filter_url_script');
 
+function villarai_fonts() {
+    wp_enqueue_style(
+        'villarai-lora-font',
+        'https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap',
+        array(),
+        null
+    );
+}
+add_action('wp_enqueue_scripts', 'villarai_fonts');
 
